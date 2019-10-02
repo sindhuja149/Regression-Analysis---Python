@@ -1,0 +1,62 @@
+import pandas as pd
+import numpy as np
+from sklearn import linear_model
+from sklearn.model_selection import train_test_split
+import seaborn as sns
+from sklearn import metrics
+import matplotlib.pyplot as plt
+%matplotlib inline
+
+
+df = pd.read_csv('C://Users//surabhi//Desktop//DataScience//lr//data.csv', index_col=False)
+df.head()
+df.shape
+
+# Data Visualization : To visualize distribution of data using regression line 
+sns.jointplot(x=df['Hours'], y=df['Marks'], data=df, kind='reg')
+
+########### Seggregating data into test and train values ##########
+
+x_train, x_test, y_train, y_test = train_test_split(df['Hours'], df['Marks'], test_size=0.2, random_state=42)
+x_train = np.reshape(x_train, (-1,1))
+x_test = np.reshape(x_test, (-1,1))
+y_train = np.reshape(y_train, (-1,1))
+y_test = np.reshape(y_test, (-1,1))
+
+print('Train - Predictors shape', x_train.shape)
+print('Test - Predictors shape', x_test.shape)
+print('Train - Target shape', y_train.shape)
+print('Test - Target shape', y_test.shape)
+
+######output######
+Train - Predictors shape (80, 1)
+Test - Predictors shape (20, 1)
+Train - Target shape (80, 1)
+Test - Target shape (20, 1)
+
+###################### Linear Regression Using Scikit #####################
+cls = linear_model.LinearRegression()
+cls.fit(x_train,y_train)
+######output######
+LinearRegression(copy_X=True, fit_intercept=True, n_jobs=1, normalize=False)
+##################
+prediction = cls.predict(x_test)
+cls.get_params()
+
+print('Co-efficient of linear regression',cls.coef_) 
+print('Intercept of linear regression model',cls.intercept_)
+print('Mean Square Error', metrics.mean_squared_error(y_test, prediction))
+print('Model R^2 Square value', metrics.r2_score(y_test, prediction))
+
+#######################Model Regression line on test set######################
+plt.scatter(x_test, y_test)
+plt.plot(x_test, prediction, color='red', linewidth=3)
+plt.xlabel('Hours')
+plt.ylabel('Marks')
+plt.title('Linear Regression')
+
+################################# Residual plot ################################
+plt.scatter(cls.predict(x_test), cls.predict(x_test) - y_test, c='g', s = 40)
+plt.hlines(y=0, xmin=0, xmax=100)
+plt.title('Residual plot')
+plt.ylabel('Residual')
